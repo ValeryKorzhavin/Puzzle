@@ -36,3 +36,140 @@ body {
   color: #464242;
   top: 10px;
 }
+
+.workspace {
+  display: inline-block;
+  position: relative;
+  top: 20px;
+  width: 900px;
+  height: 400px;
+}
+
+.check {
+  display: inline-block;
+  position: relative;
+  top: 40px;
+  height: 40px;
+  width:  70px;
+  font-size: 18px;
+  color: #464242;
+  border: 2px solid #424242;
+  border-radius: 10px;
+}
+
+.check.wrong {
+  background-color: rgb(220, 20, 60);
+  border-color: rgb(128, 0, 0);
+}
+
+.puzzle {
+  position: absolute;
+  border: 1px solid black;
+  height: 120px;
+  width: 120px;
+}
+
+.puzzle.puz0-0 {
+  top: 10px;
+  left: 10px;
+}
+
+.puzzle.puz0-1 {
+  top: 10px;
+  left: 140px;
+}
+
+.puzzle.puz0-2 {
+  top: 10px;
+  left: 270px;
+}
+
+.puzzle.puz1-0 {
+  top: 140px;
+  left: 10px;
+}
+
+.puzzle.puz1-1 {
+  top: 140px;
+  left: 140px;
+}
+
+.puzzle.puz1-2 {
+  top: 140px;
+  left: 270px;
+}
+
+.puzzle.puz2-0 {
+  top: 270px;
+  left: 10px;
+}
+
+.puzzle.puz2-1 {
+  top: 270px;
+  left: 140px;
+}
+
+.puzzle.puz2-2 {
+  top: 270px;
+  left: 270px;
+}
+
+.image {
+  position: absolute;
+  height: 120px;
+  width: 120px;
+}
+
+.image.img0-0 {
+  top: 10px;
+  left: 500px;
+  background: url("../img/0_0.png") no-repeat;
+}
+
+.image.img0-1 {
+  top: 10px;
+  left: 630px;
+  background: url("../img/0_1.png") no-repeat;
+}
+
+.image.img0-2 {
+  top: 10px;
+  left: 760px;
+  background: url("../img/0_2.png") no-repeat;
+}
+
+.image.img1-0 {
+  top: 140px;
+  left: 500px;
+  background: url("../img/1_0.png") no-repeat;
+}
+
+.image.img1-1 {
+  top: 140px;
+  left: 630px;
+  background: url("../img/1_1.png") no-repeat;
+}
+
+.image.img1-2 {
+  top: 140px;
+  left: 760px;
+  background: url("../img/1_2.png") no-repeat;
+}
+
+.image.img2-0 {
+  top: 270px;
+  left: 500px;
+  background: url("../img/2_0.png") no-repeat;
+}
+
+.image.img2-1 {
+  top: 270px;
+  left: 630px;
+  background: url("../img/2_1.png") no-repeat;
+}
+
+.image.img2-2 {
+  top: 270px;
+  left: 760px;
+  background: url("../img/2_2.png") no-repeat;
+}
