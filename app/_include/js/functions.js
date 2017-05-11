@@ -22,13 +22,9 @@ function shuffleFragments(fragments) {
 function dragFragment(data) {
   var fragments = data.images;
   var parent = data.parent;
+  var window = data.window;
 
-  fragments.each(function(index, element) {
-    $(element).draggable({
-      containment: 'parent'
-    });
-  });
-  /*
+
   fragments.on('mousedown', function(event) {
     var fragment = $(this);
     var pos = {};
@@ -38,7 +34,7 @@ function dragFragment(data) {
       top: event.offsetY,
     };
 
-    parent.on('mousemove', function(event) {
+    window.on('mousemove', function(event) {
       pos.parent = parent.offset();
       pos.cursor = {
         left: event.pageX,
@@ -50,20 +46,29 @@ function dragFragment(data) {
 
       var leftPos = pos.cursor.left - pos.parent.left - pos.inner.left;
       var topPos = pos.cursor.top - pos.parent.top - pos.inner.top;
-      leftPos = leftPos < 0 ? 0 : leftPos;
-      leftPos = leftPos > parentWidth - 120 ? parentWidth - 120 : leftPos;
-      topPos = topPos < 0 ? 0 : topPos;
-      topPos = topPos > parentHeight - 120 ? parentHeight - 120 : topPos;
-      new_pos = {
+
+      if (leftPos < 0) {
+        leftPos = 0;
+      }
+      if (leftPos > parentWidth - 120) {
+        leftPos = leftPos > parentWidth - 120;
+      }
+      if (topPos < 0) {
+        topPos = 0;
+      }
+      if (topPos > parentHeight - 120) {
+        topPos = parentHeight - 120;
+      }
+      var new_pos = {
         left: leftPos,
         top: topPos,
       };
+
       fragment.css(new_pos);
     });
 
-    fragments.on('mouseup', function() {
-      fragment.off("mouseup");
-      parent.off("mousemove");
+    window.on('mouseup', function() {
+      window.off("mousemove");
     });
-  });*/
+  });
 }

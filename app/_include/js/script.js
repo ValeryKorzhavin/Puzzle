@@ -7,6 +7,7 @@ $(document).ready(function() {
     images: $('.image'),
     parent: $('.workspace'),
     scene: $('.scene'),
+    window: $(window),
   };
 
   shuffleFragments(data.images);
