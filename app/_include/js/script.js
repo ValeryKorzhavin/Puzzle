@@ -7,10 +7,15 @@ $(document).ready(function() {
     images: $('.image'),
     parent: $('.workspace'),
     scene: $('.scene'),
+    button: $('.check'),
     window: $(window),
+    message: $('.message'),
   };
 
-  shuffleFragments(data.images);
+  initPuzzleObjects(data);
+  initImageObjects(data)
+  buttonHandler(data);
   dragFragment(data);
+  //shuffleFragments(data.images);
 
 });
