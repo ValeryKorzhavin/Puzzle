@@ -12,10 +12,9 @@ $(document).ready(function() {
     message: $('.message'),
   };
 
-  initPuzzleObjects(data);
-  initImageObjects(data)
+  initPuzzleObjects(data.puzzles);
+  initImageObjects(data.images);
   buttonHandler(data);
-  dragFragment(data);
-  //shuffleFragments(data.images);
+  dragFragment(data);  
 
 });

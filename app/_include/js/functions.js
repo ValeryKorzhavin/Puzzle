@@ -9,61 +9,52 @@ function getRandomPos() {
   };
 }
 
-function initPuzzleObjects(data) {
-  data.puzzle = (function() {
-    var array = [];
-    data.puzzles.each(function(index, element) {
+function initPuzzleObjects(puzzles) {
+    puzzles.each(function(index, element) {
       var leftOffset = 10;
       var topOffset = 10;
       var dist = 1;
-      var leftPos = index % 3 * 120 + dist * (index % 3) + leftOffset;
-      var topPos = Math.floor(index / 3) * 120 + dist *
-                   Math.floor(index / 3) + topOffset;
-      var object = {
-        puz: $(element).css({
-          'left': leftPos,
-          'top': topPos,
-        }),
-        busy: false,
-        pos: {
-          left: leftPos,
-          top: topPos,
-        }
+      var position = {
+          left: (index % 3) * 120 + dist *
+                (index % 3) + leftOffset,
+          top: Math.floor(index / 3) * 120 + dist *
+               Math.floor(index / 3) + topOffset,
       }
-      array.push(object);
+      var object = {
+        busy: false,
+        pos: position,
+      };
+      $(element).css(position)
+      $(element).data(object);
     });
-    return array;
-  })();
 }
 
-function initImageObjects(data) {
-  data.image = (function() {
-    var array = [];
-    data.images.each(function(index, element) {
+function initImageObjects(images) {
+    images.each(function(index, element) {
       var position = getRandomPos();
       var object = {
-        img: $(element).css({
-          'top': position.top,
-          'left': position.left,
-        }),
         pos: position,
         onPlace: false,
         puz: -1,
-      }
-      array.push(object);
+      };
+      $(element).css(position);
+      $(element).data(object);
     });
-    return array;
-  })();
 }
 
-function checkInside(puzzles, position) {
+function checkInside(puzzles, fragment) {
   var selectedPuzzle = -1;
+  var center = {
+    left: fragment.position().left + 60,
+    top: fragment.position().top + 60,
+  };
 
-  puzzles.forEach(function(item, index) {
-    if (position.left > item.pos.left &&
-        position.left < item.pos.left + 120 &&
-        position.top > item.pos.top &&
-        position.top < item.pos.top + 120) {
+  puzzles.each(function(index, element) {
+    var puzzlePos = $(element).data().pos;
+    if (center.left > puzzlePos.left &&
+        center.left < puzzlePos.left + 120 &&
+        center.top > puzzlePos.top &&
+        center.top < puzzlePos.top + 120) {
       selectedPuzzle = index;
       return false;
     }
@@ -73,17 +64,18 @@ function checkInside(puzzles, position) {
 }
 
 function checkSolution(data) {
-  var images = data.image;
-  var puzzles = data.puzzle;
+  var images = data.images;
+  var puzzles = data.puzzles;
   var scene = data.scene;
   var button = data.button;
   var message = data.message;
   var result = true;
   var wrongFragments = [];
 
-  images.forEach(function(item, index) {
-    if (!item.onPlace) {
-      wrongFragments.push(item);
+  images.each(function(index, element) {
+    var image = $(element);
+    if (!image.data().onPlace) {
+      wrongFragments.push(image);
       result = false;
     }
   });
@@ -101,11 +93,12 @@ function checkSolution(data) {
       message.fadeOut();
 
       wrongFragments.forEach(function(item, index) {
-        puzzles[item.puz].busy = false;
-        item.puz = -1;
-        item.img.animate({
-          left: item.pos.left,
-          top: item.pos.top
+        var imageData = item.data();
+        puzzles.eq(imageData.puz).data().busy = false;
+        imageData.puz = -1;
+        item.animate({
+          left: imageData.pos.left,
+          top: imageData.pos.top
         }, 500);
       });
 
@@ -133,11 +126,12 @@ function buttonHandler(data) {
 }
 
 function isPuzzlesReady(data) {
-  var puzzles = data.puzzle;
+  var puzzles = data.puzzles;
   var result = true;
 
-  puzzles.forEach(function(item, index) {
-    if (!item.busy) {
+  puzzles.each(function(index, element) {
+    var puzzleData = $(element).data();
+    if (!puzzleData.busy) {
       result = false;
       return false;
     }
@@ -146,11 +140,25 @@ function isPuzzlesReady(data) {
   return result;
 }
 
+function switchOnActionHandlers(data, fragment) {
+  return function() {
+    buttonHandler(data);
+    dragFragment(data);
+    fragment.removeClass('high-priority');
+  }
+}
+
+function moveFragment(fragment, pos, data) {
+  fragment.animate({
+    left: pos.left,
+    top: pos.top},
+    500,
+    switchOnActionHandlers(data, fragment));
+}
+
 function dragFragment(data) {
   var images = data.images;
   var puzzles = data.puzzles;
-  var image = data.image;
-  var puzzle = data.puzzle;
   var parent = data.parent;
   var button = data.button;
   var window = data.window;
@@ -159,9 +167,9 @@ function dragFragment(data) {
     var fragment = $(this);
     var pos = {};
 
+    var fragmentData = fragment.data();
     var fragmentIndex = fragment.index('.image');
-    var fragmentObject = data.image[fragmentIndex];
-    var srcPos = fragmentObject.pos;
+    var srcPos = fragment.data().pos;
 
     fragment.addClass('high-priority');
     button.off('click');
@@ -202,60 +210,42 @@ function dragFragment(data) {
         top: topPos,
       };
 
-      var puzzleIndex = fragmentObject.puz;
+      var puzzleIndex = fragmentData.puz;
       if (puzzleIndex >= 0) {
-          puzzle[puzzleIndex].busy = false;
-          fragmentObject.puz = -1;
+          puzzles.eq(puzzleIndex).data().busy = false;
+          fragmentData.puz = -1;
       }
 
       fragment.css(newPos);
     });
 
     window.on('mouseup', function() {
-      var fragmentPos = fragment.position();
-      var fragmentCenter = {
-        left: fragmentPos.left + 60,
-        top: fragmentPos.top + 60,
-      };
-
-      var actionsSwitchOn = function(data, fragment) {
-        return function() {
-          buttonHandler(data);
-          dragFragment(data);
-          fragment.removeClass('high-priority');
-        }
-      };
-
-      function moveFragment(fragment, pos) {
-        fragment.animate({
-          left: pos.left,
-          top: pos.top},
-          500,
-          actionsSwitchOn(data, fragment));
-      }
-
-      var puzzleIndex = checkInside(puzzle, fragmentCenter);
+      var puzzleIndex = checkInside(puzzles, fragment);
 
       if (puzzleIndex >= 0) {
-        var puzzlePos = puzzle[puzzleIndex].pos;
+        var puzzle = puzzles.eq(puzzleIndex).data();
+        var puzzlePos = puzzle.pos;
 
-        if (!puzzle[puzzleIndex].busy) {
-          puzzle[puzzleIndex].busy = true;
-          image[fragmentIndex].puz = puzzleIndex;
-          image[fragmentIndex].onPlace = fragmentIndex === puzzleIndex;
-          moveFragment(fragment, puzzlePos);
-        } else if (puzzlePos.left !== fragmentPos.left &&
-                   puzzlePos.top !== fragmentPos.top) {
-          moveFragment(fragment, srcPos);
+        if (!puzzle.busy) {
+          puzzle.busy = true;
+
+          fragmentData.puz = puzzleIndex;
+          fragmentData.onPlace = fragmentIndex === puzzleIndex;
+
+          moveFragment(fragment, puzzlePos, data);
+
+        } else if (puzzlePos.left !== fragment.position().left &&
+                   puzzlePos.top !== fragment.position().top) {
+          moveFragment(fragment, srcPos, data);
         } else {
-          actionsSwitchOn(data, fragment)();
+          switchOnActionHandlers(data, fragment)();
         }
       } else {
-        moveFragment(fragment, srcPos);
+        moveFragment(fragment, srcPos, data);
       }
 
       button.prop('disabled', !isPuzzlesReady(data));
-      window.off('mouseup')
+      window.off('mouseup');
       window.off('mousemove');
     });
   });
