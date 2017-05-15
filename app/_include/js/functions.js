@@ -149,11 +149,13 @@ function switchOnActionHandlers(data, fragment) {
 }
 
 function moveFragment(fragment, pos, data) {
-  fragment.animate({
-    left: pos.left,
-    top: pos.top},
+  fragment.removeClass('on-move');
+  fragment.animate(
+    pos,
     500,
-    switchOnActionHandlers(data, fragment));
+    switchOnActionHandlers(data, fragment)
+  );
+
 }
 
 function dragFragment(data) {
@@ -215,6 +217,7 @@ function dragFragment(data) {
           puzzles.eq(puzzleIndex).data().busy = false;
           fragmentData.puz = -1;
       }
+      fragment.addClass('on-move');
 
       fragment.css(newPos);
     });
@@ -234,8 +237,7 @@ function dragFragment(data) {
 
           moveFragment(fragment, puzzlePos, data);
 
-        } else if (puzzlePos.left !== fragment.position().left &&
-                   puzzlePos.top !== fragment.position().top) {
+        } else if (fragment.hasClass('on-move')) {
           moveFragment(fragment, srcPos, data);
         } else {
           switchOnActionHandlers(data, fragment)();
